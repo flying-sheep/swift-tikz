@@ -12,13 +12,6 @@
 			"quoteStyle": "single",
 		},
 	},
-	"linter": {
-		"rules": {
-			"complexity": {
-				"useLiteralKeys": "off", // conflicts with tsconfig noPropertyAccessFromIndexSignature: https://github.com/biomejs/biome/issues/463
-			},
-		},
-	},
 	"overrides": [
 		{
 			"include": [".vscode/*.json", "tsconfig.json", "**/*.jsonc"],
@@ -29,16 +22,6 @@
 				"parser": {
 					"allowComments": true,
 					"allowTrailingCommas": true,
-				},
-			},
-		},
-		{
-			"include": ["src/build-tools/rst.tsx", "src/build-tools/md.tsx"],
-			"linter": {
-				"rules": {
-					"correctness": {
-						"useJsxKeyInIterable": "off", // Static tree, no need for key
-					},
 				},
 			},
 		},

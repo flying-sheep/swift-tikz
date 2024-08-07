@@ -1,7 +1,7 @@
-import type { CompileResult, Engine } from './common';
+import type { CompileResult, Engine } from './common'
 
-export { EngineStatus, CompileResult } from './common';
+export { EngineStatus, CompileResult } from './common'
 
 export class DvipdfmxEngine extends Engine {
-    compilePDF(): Promise<CompileResult>;
+	compilePDF(): Promise<CompileResult>
 }

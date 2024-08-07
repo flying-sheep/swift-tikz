@@ -1,0 +1,12 @@
+{
+	"[json][jsonc][typescript][typescriptreact]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "biomejs.biome",
+	},
+	"search.exclude": {
+		"**/.yarn": true,
+		"**/.pnp.*": true,
+	},
+	"typescript.tsdk": ".yarn/sdks/typescript/lib",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+}

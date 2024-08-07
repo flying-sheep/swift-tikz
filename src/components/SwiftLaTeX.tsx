@@ -1,19 +1,20 @@
-import { useCallback, useState, type FC } from 'react'
+import { useMemo, useState, type FC } from 'react'
 import type { PdfTeXEngine } from '../SwiftLatex/PdfTeXEngine'
 import type { XeTeXEngine } from '../SwiftLatex/XeTeXEngine'
-import type {
-	CompileResult, // it’s really different classes from each, but we don’t construct them
-	DvipdfmxEngine,
-} from '../SwiftLatex/DvipdfmxEngine'
+import type { DvipdfmxEngine } from '../SwiftLatex/DvipdfmxEngine'
 import { useAsync } from 'react-use'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
-import Box, { type BoxProps } from '@mui/material/Box'
+import { Document, Page, type DocumentProps, pdfjs } from 'react-pdf'
+import 'react-pdf/dist/Page/AnnotationLayer.css'
+import 'react-pdf/dist/Page/TextLayer.css'
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
 type Engine = PdfTeXEngine | XeTeXEngine | DvipdfmxEngine
 type EngineName = 'pdftex' | 'xetex' | 'dvipdfmx'
 
-export interface Props extends Omit<BoxProps<'object'>, 'type' | 'data'> {
+export interface Props extends Omit<DocumentProps, 'file'> {
 	/** Engine to use
 	 * - 'pdftex' (default): PdfTeXEngine
 	 * - 'xetex': XeTeXEngine
@@ -33,7 +34,7 @@ const SwiftLaTeX: FC<Props> = ({
 	tex,
 	mainFileName = 'main.tex',
 	extraFiles,
-	...boxProps
+	...docProps
 }) => {
 	const [result, setResult] = useState<
 		{ pdf: Uint8Array; log: string } | undefined
@@ -45,13 +46,13 @@ const SwiftLaTeX: FC<Props> = ({
 	)
 
 	const { value: newResult, error: compileError } = useAsync(async () => {
-		if (!engine) return
+		// TODO: debounce instead of checking isReady
+		if (!engine || !engine.isReady()) return
 		engine.writeMemFSFile(mainFileName, tex)
 		engine.setEngineMainFile(mainFileName)
 		for (const [filename, srccode] of toMap(extraFiles).entries()) {
 			engine.writeMemFSFile(filename, srccode)
 		}
-		console.log(`Compiling ${mainFileName}`)
 		const { pdf, status, log } =
 			'compileLaTeX' in engine
 				? await engine.compileLaTeX()
@@ -76,12 +77,13 @@ const SwiftLaTeX: FC<Props> = ({
 		)
 	}
 
-	if (!engine || !result) return
-
-	const blob = new Blob([result.pdf], { type: 'application/pdf' })
-	const url = URL.createObjectURL(blob)
+	const file = useMemo(() => result && { data: result.pdf }, [result])
 	return (
-		<Box component="object" type="application/pdf" data={url} {...boxProps} />
+		file && (
+			<Document file={file} {...docProps}>
+				<Page pageNumber={1} />
+			</Document>
+		)
 	)
 }
 

@@ -33,7 +33,14 @@ const App: FC = () => {
 				defaultValue={DEFAULT_DOC}
 				onChange={handleEditorChange}
 			/>
-			<SwiftLaTeX tex={tex} />
+			<Box
+				overflow="auto"
+				display="flex"
+				alignItems="center"
+				justifyContent="center"
+			>
+				<SwiftLaTeX tex={tex} />
+			</Box>
 		</Box>
 	)
 }

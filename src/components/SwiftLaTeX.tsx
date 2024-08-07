@@ -5,7 +5,7 @@ import type {
 	CompileResult, // it’s really different classes from each, but we don’t construct them
 	DvipdfmxEngine,
 } from '../SwiftLatex/DvipdfmxEngine'
-import { useAsync } from 'react-async'
+import { useAsync } from 'react-use'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box, { type BoxProps } from '@mui/material/Box'
@@ -32,47 +32,51 @@ const SwiftLaTeX: FC<Props> = ({
 	engine: engineArg = 'pdftex',
 	tex,
 	mainFileName = 'main.tex',
-	extraFiles = new Map(),
+	extraFiles,
 	...boxProps
 }) => {
-	const [result, setResult] = useState<CompileResult | null>(null)
+	const [result, setResult] = useState<
+		{ pdf: Uint8Array; log: string } | undefined
+	>(undefined)
 
-	const promiseFn = useCallback(() => makeEngine(engineArg), [engineArg])
-	const { data: engine, error } = useAsync({ promiseFn })
-	if (error) {
-		console.error(error)
-		return (
-			<Alert>
-				<AlertTitle>Error</AlertTitle>
-				{error.message}
-			</Alert>
-		)
-	}
-	if (!engine) return
+	const { value: engine, error: makeEngineError } = useAsync(
+		() => makeEngine(engineArg),
+		[engineArg],
+	)
 
-	if (!result) {
+	const { value: newResult, error: compileError } = useAsync(async () => {
+		if (!engine) return
 		engine.writeMemFSFile(mainFileName, tex)
 		engine.setEngineMainFile(mainFileName)
 		for (const [filename, srccode] of toMap(extraFiles).entries()) {
 			engine.writeMemFSFile(filename, srccode)
 		}
-		if ('compileLaTeX' in engine) {
-			engine.compileLaTeX().then(setResult)
-		} else {
-			engine.compilePDF().then(setResult)
+		console.log(`Compiling ${mainFileName}`)
+		const { pdf, status, log } =
+			'compileLaTeX' in engine
+				? await engine.compileLaTeX()
+				: await engine.compilePDF()
+		if (status !== 0) {
+			throw new Error(log)
 		}
-		return null
-	}
+		return { pdf, log }
+	}, [tex, mainFileName, extraFiles, engine])
 
-	if (result.status !== 0) {
-		console.error(result.log)
+	// don’t rerender when result gets unset for a second
+	if (newResult && newResult !== result) setResult(newResult)
+
+	const error = makeEngineError ?? compileError
+	if (error) {
+		console.error(error)
 		return (
 			<Alert severity="error">
-				<AlertTitle>LaTeX Error</AlertTitle>
-				<pre>{result.log}</pre>
+				<AlertTitle>Error</AlertTitle>
+				<pre>{error.message}</pre>
 			</Alert>
 		)
 	}
+
+	if (!engine || !result) return
 
 	const blob = new Blob([result.pdf], { type: 'application/pdf' })
 	const url = URL.createObjectURL(blob)
@@ -109,8 +113,9 @@ async function makeEngine(engine: Engine | EngineName): Promise<Engine> {
 }
 
 function toMap(
-	files: Map<string, string> | Record<string, string>,
+	files: Map<string, string> | Record<string, string> | undefined,
 ): Map<string, string> {
+	if (!files) return new Map()
 	if (files instanceof Map) return files
 	return new Map(Object.entries(files))
 }

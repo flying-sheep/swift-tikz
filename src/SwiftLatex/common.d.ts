@@ -5,12 +5,17 @@ export enum EngineStatus {
 	Error = 4,
 }
 
-export class CompileResult {
-	pdf: Uint8Array
-	status: number
-	log: string
-	constructor()
-}
+export type CompileResult =
+	| {
+			pdf: Uint8Array
+			status: 0
+			log: string
+	  }
+	| {
+			pdf: undefined
+			status: 1
+			log: string
+	  }
 
 export class Engine {
 	latexWorker: Worker

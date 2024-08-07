@@ -14,11 +14,25 @@ type Engine = PdfTeXEngine | XeTeXEngine | DvipdfmxEngine
 type EngineName = 'pdftex' | 'xetex' | 'dvipdfmx'
 
 export interface Props extends Omit<BoxProps<'object'>, 'type' | 'data'> {
+	/** Engine to use
+	 * - 'pdftex' (default): PdfTeXEngine
+	 * - 'xetex': XeTeXEngine
+	 * - 'dvipdfmx': DvipdfmxEngine
+	 */
 	engine?: Engine | EngineName
+	/** LaTeX code for the main file */
+	tex: string
+	/** name of the main file (default: 'main.tex') */
+	mainFileName?: string
+	/** extra files */
+	extraFiles?: Map<string, string> | Record<string, string>
 }
 
 const SwiftLaTeX: FC<Props> = ({
 	engine: engineArg = 'pdftex',
+	tex,
+	mainFileName = 'main.tex',
+	extraFiles = new Map(),
 	...boxProps
 }) => {
 	const [result, setResult] = useState<CompileResult | null>(null)
@@ -37,11 +51,11 @@ const SwiftLaTeX: FC<Props> = ({
 	if (!engine) return
 
 	if (!result) {
-		engine.writeMemFSFile(
-			'main.tex',
-			'\\documentclass{article}\n\\begin{document}\nHi!\n\\end{document}\n',
-		)
-		engine.setEngineMainFile('main.tex')
+		engine.writeMemFSFile(mainFileName, tex)
+		engine.setEngineMainFile(mainFileName)
+		for (const [filename, srccode] of toMap(extraFiles).entries()) {
+			engine.writeMemFSFile(filename, srccode)
+		}
 		if ('compileLaTeX' in engine) {
 			engine.compileLaTeX().then(setResult)
 		} else {
@@ -55,7 +69,7 @@ const SwiftLaTeX: FC<Props> = ({
 		return (
 			<Alert severity="error">
 				<AlertTitle>LaTeX Error</AlertTitle>
-				{result.log}
+				<pre>{result.log}</pre>
 			</Alert>
 		)
 	}
@@ -92,4 +106,11 @@ async function makeEngine(engine: Engine | EngineName): Promise<Engine> {
 	}
 	await engine.loadEngine()
 	return engine
+}
+
+function toMap(
+	files: Map<string, string> | Record<string, string>,
+): Map<string, string> {
+	if (files instanceof Map) return files
+	return new Map(Object.entries(files))
 }

@@ -5,5 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const node = document.getElementById('root')
 	if (!node) return
 	const root = createRoot(node)
-	root.render(<SwiftLaTeX />)
+	root.render(
+		<SwiftLaTeX tex="\documentclass{article}\begin{document}Hi!\end{document}" />,
+	)
 })

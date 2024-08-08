@@ -9,3 +9,7 @@ html, body, #root {
 .react-pdf__Page {
     box-shadow: 0 0 10px black;
 }
+
+.hidden {
+    display: none;
+}

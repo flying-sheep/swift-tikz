@@ -5,11 +5,7 @@ import type { DvipdfmxEngine } from '../SwiftLatex/DvipdfmxEngine'
 import { useAsync } from 'react-use'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
-import { Document, Page, type DocumentProps, pdfjs } from 'react-pdf'
-import 'react-pdf/dist/Page/AnnotationLayer.css'
-import 'react-pdf/dist/Page/TextLayer.css'
-
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
+import { Document, Page, type DocumentProps } from 'react-pdf'
 
 type Engine = PdfTeXEngine | XeTeXEngine | DvipdfmxEngine
 type EngineName = 'pdftex' | 'xetex' | 'dvipdfmx'
@@ -66,6 +62,8 @@ const SwiftLaTeX: FC<Props> = ({
 	// don’t rerender when result gets unset for a second
 	if (newResult && newResult !== result) setResult(newResult)
 
+	const file = useMemo(() => result && { data: result.pdf }, [result])
+
 	const error = makeEngineError ?? compileError
 	if (error) {
 		console.error(error)
@@ -77,7 +75,7 @@ const SwiftLaTeX: FC<Props> = ({
 		)
 	}
 
-	const file = useMemo(() => result && { data: result.pdf }, [result])
+	// return file && <FastDocument file={file} {...docProps} />
 	return (
 		file && (
 			<Document file={file} {...docProps}>

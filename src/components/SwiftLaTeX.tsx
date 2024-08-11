@@ -42,8 +42,10 @@ const SwiftLaTeX: FC<Props> = ({
 	)
 
 	const { value: newResult, error: compileError } = useAsync(async () => {
-		// TODO: debounce instead of checking isReady
-		if (!engine || !engine.isReady()) return
+		if (!engine) return
+		while (!engine.isReady()) {
+			await new Promise((resolve) => setTimeout(resolve, 100))
+		}
 		engine.writeMemFSFile(mainFileName, tex)
 		engine.setEngineMainFile(mainFileName)
 		for (const [filename, srccode] of toMap(extraFiles).entries()) {
@@ -87,8 +89,9 @@ const SwiftLaTeX: FC<Props> = ({
 
 export default SwiftLaTeX
 
-async function makeEngine(engine: Engine | EngineName): Promise<Engine> {
-	switch (engine) {
+async function makeEngine(engineOrName: Engine | EngineName): Promise<Engine> {
+	let engine: Engine
+	switch (engineOrName) {
 		case 'pdftex': {
 			const { PdfTeXEngine } = await import('../SwiftLatex/PdfTeXEngine')
 			engine = new PdfTeXEngine()
@@ -104,6 +107,8 @@ async function makeEngine(engine: Engine | EngineName): Promise<Engine> {
 			engine = new DvipdfmxEngine()
 			break
 		}
+		default:
+			engine = engineOrName
 	}
 	if (!('latexWorker' in engine)) {
 		throw Error('engine must be PdfTeXEngine or XeTeXEngine or DvipdfmxEngine')

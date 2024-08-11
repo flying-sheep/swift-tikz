@@ -1,9 +1,13 @@
-import { useCallback, useState, type FC } from 'react'
+import { useCallback, type FC } from 'react'
 import SwiftLaTeX from './SwiftLaTeX'
 import Editor, { type OnChange } from '@monaco-editor/react'
 import Box from '@mui/material/Box'
+import { useLocalStorage } from 'react-use'
+// https://github.com/streamich/react-use/pull/2475
+import useThrottle from '../use-throttle'
 
-const DEFAULT_DOC = `\
+const STORAGE_KEY = 'swift-tikz'
+const DEFAULT_DOC: string = `\
 \\documentclass{article}
 \\begin{document}
 Hi!
@@ -11,14 +15,18 @@ Hi!
 `
 
 const App: FC = () => {
-	const [tex, setTex] = useState(DEFAULT_DOC)
+	const [tex = DEFAULT_DOC, setTex, _remove] = useLocalStorage(
+		STORAGE_KEY,
+		DEFAULT_DOC,
+	)
+	const throttledTex = useThrottle(tex, 100)
 
 	const handleEditorChange = useCallback<OnChange>(
 		(value, _event) => {
 			if (!value || value === tex) return
 			setTex(value)
 		},
-		[tex],
+		[tex, setTex],
 	)
 	return (
 		<Box
@@ -30,7 +38,7 @@ const App: FC = () => {
 				width="50vw"
 				height="auto"
 				defaultLanguage="latex"
-				defaultValue={DEFAULT_DOC}
+				value={tex}
 				onChange={handleEditorChange}
 			/>
 			<Box
@@ -39,7 +47,7 @@ const App: FC = () => {
 				alignItems="center"
 				justifyContent="center"
 			>
-				<SwiftLaTeX tex={tex} />
+				<SwiftLaTeX tex={throttledTex} />
 			</Box>
 		</Box>
 	)

@@ -1239,6 +1239,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"amdefine@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "amdefine@npm:1.0.1"
+  checksum: 10c0/ba8aa5d4ff5248b2ed067111e72644b36b5b7ae88d9a5a2c4223dddb3bdc9102db67291e0b414f59f12c6479ac6a365886bac72c7965e627cbc732e0962dd1ab
+  languageName: node
+  linkType: hard
+
 "ansi-regex@npm:^5.0.1":
   version: 5.0.1
   resolution: "ansi-regex@npm:5.0.1"
@@ -2299,6 +2306,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"madoko@npm:^1.2.3":
+  version: 1.2.3
+  resolution: "madoko@npm:1.2.3"
+  dependencies:
+    amdefine: "npm:^1.0.1"
+    mkdirp: "npm:^0.3.5"
+    requirejs: "npm:^2.3.6"
+    rimraf: "npm:^3.0.1"
+  bin:
+    madoko: lib/cli.js
+  checksum: 10c0/6eb766637aa1de4a3a4c1ba1daf1eb4a42fa7c8f3334b848aa136d92acb673f5ea33ff8559a74327dc0305c52200c6ae8d4df0bb26f66b66dd6446ddb90a8f81
+  languageName: node
+  linkType: hard
+
 "magic-string@npm:^0.30.1":
   version: 0.30.11
   resolution: "magic-string@npm:0.30.11"
@@ -2493,6 +2514,13 @@ __metadata:
     minipass: "npm:^3.0.0"
     yallist: "npm:^4.0.0"
   checksum: 10c0/64fae024e1a7d0346a1102bb670085b17b7f95bf6cfdf5b128772ec8faf9ea211464ea4add406a3a6384a7d87a0cd1a96263692134323477b4fb43659a6cab78
+  languageName: node
+  linkType: hard
+
+"mkdirp@npm:^0.3.5":
+  version: 0.3.5
+  resolution: "mkdirp@npm:0.3.5"
+  checksum: 10c0/73b9ea9e94ef3cb465d9846289131ed202a2a6402b62dc9a9425609514e5a1819ac1990406c58c55fc8fa73890d7bfdf4e3540f3b6aa2b9d32702374be7f4387
   languageName: node
   linkType: hard
 
@@ -2953,6 +2981,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"requirejs@npm:^2.3.6":
+  version: 2.3.7
+  resolution: "requirejs@npm:2.3.7"
+  bin:
+    r.js: bin/r.js
+    r_js: bin/r.js
+  checksum: 10c0/2d77a57b949eba5a69fbc0a38acc6c621443696c5327ed75117f36c92ce2d05829fe6cc2fb2aebfb2fa65df7b17fd268e57782e8c817f8fcc2a07d06a50c0a5b
+  languageName: node
+  linkType: hard
+
 "resize-observer-polyfill@npm:^1.5.1":
   version: 1.5.1
   resolution: "resize-observer-polyfill@npm:1.5.1"
@@ -3007,7 +3045,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:^3.0.2":
+"rimraf@npm:^3.0.1, rimraf@npm:^3.0.2":
   version: 3.0.2
   resolution: "rimraf@npm:3.0.2"
   dependencies:
@@ -3417,6 +3455,7 @@ __metadata:
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
     "@vitejs/plugin-react": "npm:^4.3.1"
+    madoko: "npm:^1.2.3"
     monaco-editor: "npm:^0.50.0"
     react: "npm:^18.3.1"
     react-async: "npm:^10.0.1"

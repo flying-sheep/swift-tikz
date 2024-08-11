@@ -23,6 +23,7 @@ export interface Props extends Omit<DocumentProps, 'file'> {
 	mainFileName?: string
 	/** extra files */
 	extraFiles?: Map<string, string> | Record<string, string>
+	width?: number
 }
 
 const SwiftLaTeX: FC<Props> = ({
@@ -30,6 +31,7 @@ const SwiftLaTeX: FC<Props> = ({
 	tex,
 	mainFileName = 'main.tex',
 	extraFiles,
+	width,
 	...docProps
 }) => {
 	const [result, setResult] = useState<
@@ -81,7 +83,7 @@ const SwiftLaTeX: FC<Props> = ({
 	return (
 		file && (
 			<Document file={file} {...docProps}>
-				<Page pageNumber={1} />
+				<Page pageNumber={1} width={width} />
 			</Document>
 		)
 	)

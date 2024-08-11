@@ -2,7 +2,7 @@ import { useCallback, type FC } from 'react'
 import SwiftLaTeX from './SwiftLaTeX'
 import Editor, { type OnMount, type OnChange } from '@monaco-editor/react'
 import Box from '@mui/material/Box'
-import { useLocalStorage } from 'react-use'
+import { useLocalStorage, useMeasure } from 'react-use'
 // https://github.com/streamich/react-use/pull/2475
 import useThrottle from '../use-throttle'
 import latexLang from 'madoko/styles/lang/latex.json'
@@ -18,6 +18,7 @@ Hi!
 `
 
 const App: FC = () => {
+	const [ref, { width }] = useMeasure<HTMLDivElement>()
 	const [tex = DEFAULT_DOC, setTex, _remove] = useLocalStorage(
 		STORAGE_KEY,
 		DEFAULT_DOC,
@@ -66,12 +67,13 @@ const App: FC = () => {
 				onChange={handleEditorChange}
 			/>
 			<Box
+				ref={ref}
 				overflow="auto"
 				display="flex"
 				alignItems="center"
 				justifyContent="center"
 			>
-				<SwiftLaTeX tex={throttledTex} />
+				<SwiftLaTeX tex={throttledTex} width={width} />
 			</Box>
 		</Box>
 	)
